@@ -9,13 +9,12 @@ class TimeFormatter
     'second' => "%S"
   }
 
-  def initialize(queries)
-    @queries = queries.delete_prefix("format=").split("%2C")
+  def initialize(query)
+    @query = query
   end
 
   def result
     time_format
-    [ "#{@time.join("-")}\n" ]
   end
 
   def valid?
@@ -23,17 +22,17 @@ class TimeFormatter
   end
 
   def extra_queries
-    @queries - AVAILABLE_TIME_FORMATTE.keys
+    @query - AVAILABLE_TIME_FORMATTE.keys
   end
 
   private
 
   def time_format
-    time_now = Time.now
-    @time = []
-    @queries.each do |query|
-      @time << time_now.strftime(AVAILABLE_TIME_FORMATTE[query])
+    format = []
+    @query.each do |q|
+      format << AVAILABLE_TIME_FORMATTE[q]
     end
+    Time.now.strftime(format.join("-"))
   end
 
 end

@@ -5,35 +5,34 @@ class App
   HEADERS = { 'Content-Type' => 'text/plain' }
 
   def call(env)
-    [@status, HEADERS, body(env)]
+    path = env["REQUEST_PATH"]
+
+    case path
+    when '/time'
+      time_response(env) 
+    else
+      not_found_response
+    end
   end
 
   private
 
-  def body(env)
-    if check_request_method?(env["REQUEST_METHOD"]) & check_request_path?(env["REQUEST_PATH"])
-      fmt = TimeFormatter.new(env["QUERY_STRING"])
+  def time_response(env)
+    req = Rack::Request.new(env)
+    fmt = TimeFormatter.new(req.params['format'].split(','))
 
-      if fmt.valid?
-        @status = 200
-        fmt.result
-      else
-        @status = 400
-        ["Unknown time format #{fmt.extra_queries}\n"]
-      end
-
+    if fmt.valid?
+      response(200, ["#{fmt.result} \n"])
     else
-      @status = 404
-      [ "404. No such page!\n" ]
+      response(400, ["Unknown time format #{fmt.extra_queries}\n"])
     end
   end
 
-  def check_request_method?(method)
-    method == 'GET'
+  def not_found_response
+    [404, HEADERS, [ "404. No such page!\n" ]]
   end
 
-  def check_request_path?(path)
-    path == "/time"
+  def response(status, body)
+    Rack::Response.new(body, status, HEADERS)
   end
-
 end
