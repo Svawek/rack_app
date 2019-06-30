@@ -29,10 +29,11 @@ class App
   end
 
   def not_found_response
-    [404, HEADERS, [ "404. No such page!\n" ]]
+    response(404, [ "404. No such page!\n" ])
   end
 
   def response(status, body)
-    Rack::Response.new(body, status, HEADERS)
+    resp = Rack::Response.new(body, status, HEADERS)
+    resp.finish
   end
 end

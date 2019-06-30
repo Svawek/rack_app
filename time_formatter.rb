@@ -28,10 +28,7 @@ class TimeFormatter
   private
 
   def time_format
-    format = []
-    @query.each do |q|
-      format << AVAILABLE_TIME_FORMATTE[q]
-    end
+    format = @query.map { |q| AVAILABLE_TIME_FORMATTE[q] }
     Time.now.strftime(format.join("-"))
   end
 
